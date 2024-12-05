@@ -54,8 +54,8 @@ fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorVie
                     }
                 }
                 Column(modifier = modifier) {
-                    BackspaceButton(modifier)
-                    SpaceButton(modifier)
+                    BackspaceButton(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
+                    SpaceButton(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
                     EnterButton(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
                 }
             }
@@ -128,15 +128,19 @@ fun EnterButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobile
 }
 
 @Composable
-fun SpaceButton(modifier: Modifier) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {}, shape = CircleShape) {
+fun SpaceButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
+    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+        snapMobileRPNCalculatorViewModel.updateCurrentEntry(" ")
+    }, shape = CircleShape) {
         Icon(painter = painterResource(R.drawable.ic_space), contentDescription = null)
     }
 }
 
 @Composable
-fun BackspaceButton(modifier: Modifier) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {}, shape = CircleShape) {
+fun BackspaceButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
+    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+        snapMobileRPNCalculatorViewModel.backspace()
+    }, shape = CircleShape) {
         Icon(painter = painterResource(R.drawable.ic_backspace), contentDescription = null)
     }
 }

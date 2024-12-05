@@ -27,4 +27,8 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
     fun clearHistoricalEntry() {
         historicalEntry.value = ""
     }
+
+    fun backspace() {
+        currentEntry.value = currentEntry.value.dropLast(1)
+    }
 }
