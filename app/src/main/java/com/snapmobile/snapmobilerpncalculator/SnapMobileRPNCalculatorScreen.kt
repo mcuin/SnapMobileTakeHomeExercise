@@ -40,23 +40,23 @@ fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorVie
         val operatorsList = listOf("+", "-", "*", "/")
 
         Column(modifier = modifier.fillMaxSize().padding(scaffoldPadding)) {
-            UserHistoryText(modifier)
-            CurrentEntryText(modifier)
+            UserHistoryText(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
+            CurrentEntryText(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
             LazyVerticalGrid(modifier = modifier, columns = GridCells.Fixed(4)) {
                 items(operatorsList) {operator ->
-                    OperationButton(modifier = modifier, operator = operator)
+                    OperationButton(modifier = modifier, operator = operator, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
                 }
             }
             Row(modifier = modifier.fillMaxWidth()) {
                 LazyVerticalGrid(modifier = modifier.weight(1f), columns = GridCells.Fixed(3)) {
                     items(numbersList) { number ->
-                        NumberButton(modifier, number = number)
+                        NumberButton(modifier, number = number, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
                     }
                 }
                 Column(modifier = modifier) {
                     BackspaceButton(modifier)
                     SpaceButton(modifier)
-                    EnterButton(modifier)
+                    EnterButton(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
                 }
             }
         }
@@ -64,41 +64,65 @@ fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorVie
 }
 
 @Composable
-fun UserHistoryText(modifier: Modifier) {
+fun UserHistoryText(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
 
     TextField(modifier = modifier.fillMaxWidth(),
-        value = "Entry history and evaluation",
+        value = snapMobileRPNCalculatorViewModel.historicalEntry.value,
         onValueChange = {},
-        readOnly = true)
+        readOnly = true,
+        trailingIcon = {
+            if (snapMobileRPNCalculatorViewModel.historicalEntry.value.isNotEmpty()) {
+                Icon(modifier = modifier.padding(8.dp).clickable {
+                    snapMobileRPNCalculatorViewModel.clearHistoricalEntry()
+                },
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = null)
+            }
+        })
 }
 
 @Composable
-fun CurrentEntryText(modifier: Modifier) {
+fun CurrentEntryText(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
 
     TextField(modifier = modifier.fillMaxWidth(),
-        value = "Current entry",
+        value = snapMobileRPNCalculatorViewModel.currentEntry.value,
         onValueChange = {},
-        readOnly = true)
+        readOnly = true,
+        trailingIcon = {
+            if (snapMobileRPNCalculatorViewModel.currentEntry.value.isNotEmpty()) {
+                Icon(modifier = modifier.padding(8.dp).clickable {
+                    snapMobileRPNCalculatorViewModel.clearCurrentEntry()
+                },
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = null)
+            }
+        })
 }
 
 @Composable
-fun NumberButton(modifier: Modifier, number: Int) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {}, shape = CircleShape) {
+fun NumberButton(modifier: Modifier, number: Int, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
+    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+        snapMobileRPNCalculatorViewModel.updateCurrentEntry(number.toString())
+    }, shape = CircleShape) {
         Text(text = number.toString())
     }
 }
 
 @Composable
-fun OperationButton(modifier: Modifier, operator: String) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {},
+fun OperationButton(modifier: Modifier, operator: String, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
+    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+        snapMobileRPNCalculatorViewModel.updateCurrentEntry(operator)
+    },
         shape = CircleShape) {
         Text(text = operator)
     }
 }
 
 @Composable
-fun EnterButton(modifier: Modifier) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {}, shape = CircleShape) {
+fun EnterButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
+    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+        snapMobileRPNCalculatorViewModel.updateHistoricalEntry()
+    }, shape = CircleShape) {
         Icon(painter = painterResource(R.drawable.ic_enter), contentDescription = null)
     }
 }
