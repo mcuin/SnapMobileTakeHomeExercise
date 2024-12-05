@@ -3,6 +3,7 @@ package com.snapmobile.snapmobilerpncalculator
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.text.DecimalFormat
 import java.util.Stack
 import javax.inject.Inject
 
@@ -12,40 +13,35 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
     val operatorsList = listOf("+", "-", "*", "/")
     val historicalEntry = mutableStateOf("")
     val currentEntry = mutableStateOf("")
+    var showDecimal = false
 
     fun updateCurrentEntry(newCharacter: String) {
         currentEntry.value += newCharacter
     }
 
     fun updateHistoricalEntry() {
-        val trimmedCurrentEntry = currentEntry.value.trimEnd().replace("\\s+".toRegex(), " ")
-        if (historicalEntry.value.isNotEmpty()) {
-            historicalEntry.value += " $trimmedCurrentEntry"
-        } else {
-            historicalEntry.value = trimmedCurrentEntry
-        }
-        if (operatorsList.contains(historicalEntry.value.last().toString())) {
-            evaluate()
-        }
-
+        evaluate(historicalEntry.value, currentEntry.value)
         currentEntry.value = ""
     }
 
     fun clearCurrentEntry() {
         currentEntry.value = ""
+        showDecimal = false
     }
 
     fun clearHistoricalEntry() {
         historicalEntry.value = ""
+        showDecimal = false
     }
 
     fun backspace() {
         currentEntry.value = currentEntry.value.dropLast(1)
     }
 
-    private fun evaluate() {
-        val enteredCharacters = historicalEntry.value.split(" ")
-        val numbersStack = Stack<Int>()
+    private fun evaluate(previousHistoricalEntry: String, currentEntry: String) {
+        val trimmedCurrentEntry = previousHistoricalEntry + currentEntry.trimEnd().replace("\\s+".toRegex(), " ")
+        val enteredCharacters = trimmedCurrentEntry.split(" ")
+        val numbersStack = Stack<Double>()
 
         for (character in enteredCharacters) {
             when (character) {
@@ -67,12 +63,28 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
                 "/" -> {
                     val secondNumber = numbersStack.pop()
                     val firstNumber = numbersStack.pop()
+                    if (!showDecimal) {
+                        showDecimal = firstNumber % secondNumber != 0.0
+                    }
                     numbersStack.push(firstNumber / secondNumber)
                 }
-                else -> numbersStack.push(character.toInt())
+                else -> {
+                    if (!showDecimal) {
+                        showDecimal = character.toDouble() < 0
+                    }
+                    numbersStack.push(character.toDouble())
+                }
             }
         }
-
-        historicalEntry.value = numbersStack.joinToString(" ")
+        val decimalFormat = if (showDecimal) {
+            DecimalFormat("#.0##")
+        } else {
+            DecimalFormat("#")
+        }
+        var stackString = ""
+        for (number in numbersStack) {
+            stackString += decimalFormat.format(number) + " "
+        }
+        historicalEntry.value = stackString
     }
 }
