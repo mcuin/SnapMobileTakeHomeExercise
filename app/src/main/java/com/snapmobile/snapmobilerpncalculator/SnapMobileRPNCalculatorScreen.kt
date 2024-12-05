@@ -6,17 +6,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -29,8 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -98,8 +97,8 @@ fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorVie
          * @param modifier Modifier to be applied to the column.
          */
         Column(modifier = modifier.fillMaxSize().padding(scaffoldPadding)) {
-            UserHistoryText(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
-            CurrentEntryText(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
+            UserHistoryText(modifier = modifier.weight(1f), snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
+            CurrentEntryText(modifier = modifier.weight(2f), snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
             LazyVerticalGrid(modifier = modifier, columns = GridCells.Fixed(4)) {
                 items(operatorsList) {operator ->
                     OperationButton(modifier = modifier, operator = operator, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
@@ -129,13 +128,14 @@ fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorVie
 @Composable
 fun UserHistoryText(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
 
-    TextField(modifier = modifier.fillMaxWidth(),
+    TextField(modifier = modifier.fillMaxWidth(), textStyle = TextStyle(fontSize = MaterialTheme.typography.displaySmall.fontSize),
         value = snapMobileRPNCalculatorViewModel.historicalEntry.value,
         onValueChange = {},
         readOnly = true,
+        singleLine = true,
         trailingIcon = {
             if (snapMobileRPNCalculatorViewModel.historicalEntry.value.isNotEmpty()) {
-                Icon(modifier = modifier.padding(8.dp).clickable {
+                Icon(modifier = modifier.padding(dimensionResource(R.dimen.basic_padding)).clickable {
                     snapMobileRPNCalculatorViewModel.clearHistoricalEntry()
                 },
                     imageVector = Icons.Default.Clear,
@@ -152,13 +152,14 @@ fun UserHistoryText(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMo
 @Composable
 fun CurrentEntryText(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
 
-    TextField(modifier = modifier.fillMaxWidth(),
+    TextField(modifier = modifier.fillMaxWidth(),textStyle = TextStyle(fontSize = MaterialTheme.typography.displayLarge.fontSize),
         value = snapMobileRPNCalculatorViewModel.currentEntry.value,
         onValueChange = {},
         readOnly = true,
+        singleLine = true,
         trailingIcon = {
             if (snapMobileRPNCalculatorViewModel.currentEntry.value.isNotEmpty()) {
-                Icon(modifier = modifier.padding(8.dp).clickable {
+                Icon(modifier = modifier.padding(dimensionResource(R.dimen.basic_padding)).clickable {
                     snapMobileRPNCalculatorViewModel.clearCurrentEntry()
                 },
                     imageVector = Icons.Default.Clear,
@@ -175,7 +176,7 @@ fun CurrentEntryText(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapM
  */
 @Composable
 fun NumberButton(modifier: Modifier, number: Int, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+    Button(modifier = modifier.padding(8.dp), onClick = {
         snapMobileRPNCalculatorViewModel.updateCurrentEntry(number.toString())
     }, shape = CircleShape) {
         Text(text = number.toString())
@@ -190,7 +191,7 @@ fun NumberButton(modifier: Modifier, number: Int, snapMobileRPNCalculatorViewMod
  */
 @Composable
 fun OperationButton(modifier: Modifier, operator: String, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+    Button(modifier = modifier.padding(8.dp), onClick = {
         snapMobileRPNCalculatorViewModel.updateCurrentEntry(operator)
     },
         shape = CircleShape) {
@@ -206,7 +207,7 @@ fun OperationButton(modifier: Modifier, operator: String, snapMobileRPNCalculato
  */
 @Composable
 fun EnterButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel, scope: CoroutineScope) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+    OutlinedButton(modifier = modifier.padding(dimensionResource(R.dimen.basic_padding)), onClick = {
         scope.launch {
             snapMobileRPNCalculatorViewModel.updateHistoricalEntry()
         }
@@ -222,7 +223,7 @@ fun EnterButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobile
  */
 @Composable
 fun SpaceButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+    OutlinedButton(modifier = modifier.padding(dimensionResource(R.dimen.basic_padding)), onClick = {
         snapMobileRPNCalculatorViewModel.updateCurrentEntry(" ")
     }, shape = CircleShape) {
         Icon(painter = painterResource(R.drawable.ic_space), contentDescription = null)
@@ -236,7 +237,7 @@ fun SpaceButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobile
  */
 @Composable
 fun BackspaceButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
-    OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
+    OutlinedButton(modifier = modifier.padding(dimensionResource(R.dimen.basic_padding)), onClick = {
         snapMobileRPNCalculatorViewModel.backspace()
     }, shape = CircleShape) {
         Icon(painter = painterResource(R.drawable.ic_backspace), contentDescription = null)

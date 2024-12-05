@@ -81,9 +81,13 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
      * @param previousHistoricalEntry The previous historical entry
      * @param newCurrentEntry The new user entry
      */
-    private suspend fun evaluate(previousHistoricalEntry: String, newCurrentEntry: String) {
+    suspend fun evaluate(previousHistoricalEntry: String, newCurrentEntry: String) {
         // Combine both historical and current entries, and remove any unnecessary spaces in the new entry
-        val trimmedCurrentEntry = previousHistoricalEntry + newCurrentEntry.trimEnd().replace("\\s+".toRegex(), " ")
+        val trimmedCurrentEntry = if (previousHistoricalEntry.isNotEmpty()) {
+                previousHistoricalEntry +  " " + newCurrentEntry.trimEnd().replace("\\s+".toRegex(), " ")
+            } else {
+                newCurrentEntry.trimEnd().replace("\\s+".toRegex(), " ")
+        }
         val enteredCharacters = trimmedCurrentEntry.split(" ")
         var numbersCount = 0
         val numbersStack = Stack<Double>()
@@ -157,9 +161,9 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
         }
         var stackString = ""
         for (number in numbersStack) {
-            stackString += decimalFormat.format(number) + " "
+            stackString += " " + decimalFormat.format(number)
         }
-        historicalEntry.value = stackString
+        historicalEntry.value = stackString.trimStart()
         currentEntry.value = ""
     }
 }
