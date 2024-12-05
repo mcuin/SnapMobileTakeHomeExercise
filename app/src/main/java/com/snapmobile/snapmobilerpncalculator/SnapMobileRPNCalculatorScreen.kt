@@ -53,9 +53,16 @@ fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorVie
 
         LaunchedEffect(evaluateError.value) {
             if (evaluateError.value != null) {
-                if (evaluateError.value == EvaluateErrors.DivideByZeroError) {
-                    snackbarHostState.showSnackbar(context.getString(R.string.divide_by_zero_error))
-                    snapMobileRPNCalculatorViewModel.clearEvaluateError()
+                when (evaluateError.value) {
+                    is EvaluateErrors.DivideByZeroError -> {
+                        snackbarHostState.showSnackbar(context.getString(R.string.divide_by_zero_error))
+                        snapMobileRPNCalculatorViewModel.clearEvaluateError()
+                    }
+                    is EvaluateErrors.UnevenNotationError -> {
+                        snackbarHostState.showSnackbar(context.getString(R.string.uneven_notation_error))
+                        snapMobileRPNCalculatorViewModel.clearEvaluateError()
+                    }
+                    null -> {}
                 }
             }
         }

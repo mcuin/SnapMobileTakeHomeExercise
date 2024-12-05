@@ -40,6 +40,10 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
         currentEntry.value = currentEntry.value.dropLast(1)
     }
 
+    private suspend fun unevenNotations() {
+        _evaluateError.emit(EvaluateErrors.UnevenNotationError)
+    }
+
     suspend fun clearEvaluateError() {
         _evaluateError.emit(null)
     }
@@ -47,26 +51,43 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
     private suspend fun evaluate(previousHistoricalEntry: String, newCurrentEntry: String) {
         val trimmedCurrentEntry = previousHistoricalEntry + newCurrentEntry.trimEnd().replace("\\s+".toRegex(), " ")
         val enteredCharacters = trimmedCurrentEntry.split(" ")
+        var numbersCount = 0
         val numbersStack = Stack<Double>()
 
         for (character in enteredCharacters) {
             when (character) {
                 "+" -> {
+                    if (numbersCount < 2) {
+                        unevenNotations()
+                        return
+                    }
                     val secondNumber = numbersStack.pop()
                     val firstNumber = numbersStack.pop()
                     numbersStack.push(firstNumber + secondNumber)
                 }
                 "-" -> {
+                    if (numbersCount < 2) {
+                        unevenNotations()
+                        return
+                    }
                     val secondNumber = numbersStack.pop()
                     val firstNumber = numbersStack.pop()
                     numbersStack.push(firstNumber - secondNumber)
                 }
                 "*" -> {
+                    if (numbersCount < 2) {
+                        unevenNotations()
+                        return
+                    }
                     val secondNumber = numbersStack.pop()
                     val firstNumber = numbersStack.pop()
                     numbersStack.push(firstNumber * secondNumber)
                 }
                 "/" -> {
+                    if (numbersCount < 2) {
+                        unevenNotations()
+                        return
+                    }
                     val secondNumber = numbersStack.pop()
                     if (secondNumber == 0.0) {
                         _evaluateError.emit(EvaluateErrors.DivideByZeroError)
@@ -83,6 +104,7 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
                         showDecimal = character.toDouble() < 0
                     }
                     numbersStack.push(character.toDouble())
+                    numbersCount++
                 }
             }
         }
@@ -102,4 +124,5 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
 
 sealed class EvaluateErrors {
     data object DivideByZeroError: EvaluateErrors()
+    data object UnevenNotationError: EvaluateErrors()
 }
