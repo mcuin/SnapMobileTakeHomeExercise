@@ -37,13 +37,12 @@ fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorVie
     Scaffold { scaffoldPadding ->
 
         val numbersList = listOf(7, 8, 9, 4, 5, 6, 1, 2, 3, 0)
-        val operatorsList = listOf("+", "-", "*", "/")
 
         Column(modifier = modifier.fillMaxSize().padding(scaffoldPadding)) {
             UserHistoryText(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
             CurrentEntryText(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
             LazyVerticalGrid(modifier = modifier, columns = GridCells.Fixed(4)) {
-                items(operatorsList) {operator ->
+                items(snapMobileRPNCalculatorViewModel.operatorsList) {operator ->
                     OperationButton(modifier = modifier, operator = operator, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
                 }
             }
