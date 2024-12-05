@@ -110,6 +110,9 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
                     }
                     val secondNumber = numbersStack.pop()
                     val firstNumber = numbersStack.pop()
+                    if (firstNumber - secondNumber < 0) {
+                        showDecimal = true
+                    }
                     numbersStack.push(firstNumber - secondNumber)
                 }
                 "*" -> {
@@ -155,7 +158,7 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
 
         // Decimal formatting for negative and remainder numbers
         val decimalFormat = if (showDecimal) {
-            DecimalFormat("#.0##")
+            DecimalFormat("0.0##")
         } else {
             DecimalFormat("#")
         }
