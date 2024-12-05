@@ -21,29 +21,16 @@ class SnapMobileRPNCalculatorActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SnapMobileRPNCalculatorTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                SnapMobileRPNCalculatorApp()
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     SnapMobileRPNCalculatorTheme {
-        Greeting("Android")
+        SnapMobileRPNCalculatorApp()
     }
 }
