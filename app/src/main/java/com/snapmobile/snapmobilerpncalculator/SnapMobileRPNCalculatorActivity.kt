@@ -14,6 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.snapmobile.snapmobilerpncalculator.ui.theme.SnapMobileRPNCalculatorTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * SnapMobileRPNCalculatorActivity that is the main entry point for the app and holds the main composable function.
+ */
 @AndroidEntryPoint
 class SnapMobileRPNCalculatorActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

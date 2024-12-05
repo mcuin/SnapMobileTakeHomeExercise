@@ -2,4 +2,5 @@
     <string name="app_name">SnapMobileRPNCalculator</string>
     <string name="divide_by_zero_error">Attempting to divide by zero. Please try a different notation.</string>
     <string name="uneven_notation_error">Invalid amount of numbers to operands. Please try a different notation.</string>
+    <string name="invalid_character_error">Invalid character. Please check your spacings.</string>"
 </resources>
