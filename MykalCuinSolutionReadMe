@@ -1,0 +1,20 @@
+Description
+The provided app is a Reverse Polish Notation Calculator built for people comfortable in typing in RPN. The app is build completely native to Android in Kotlin using the Compose UI framework and MVVM style.
+
+Reasoning
+Kotlin and Compose were chosen because of modern support from Google, and the push away from the Java and XML support.
+Hilt was picked for dependency injection because of Google support as well, but Koin was explored as an alternative option. Dependency injection was used now for possible future need as well as ease of providing the viewmodel.
+The MVVM design patter was picked as the modern standard for Android development even though there was no need for a model in this project.
+The Flow library was picked as the modern reactive solution in Kotlin to quickly react to any errors the user might encounter with notation input.
+Disable Textfields were chosen for the text entry over Texts because of their access to the trailing icon which allowed the icon to clear the field rather than needing a separate button. They will also provide supporting text in future when the field is able to be validated.
+
+Trade offs/Leave Outs/Reflection
+There was a trade off in checking for user entry errors at evaluation time instead of entry time due to textfields in Compose having more validation complexity then the old XML textfields.
+I left out working with the cursor and spaces in the textfields.
+If I had more time I would have preferred alerting the user to any notation issues at user entry time using the supportText option on the Textfields.
+I also would have liked to have be able to handle spacing around operators so that users would only have to us spaces when separating numbers.
+Finally I would have liked being able to implement the cursor in the entry textfield to allow a user to keep track of where they are typing.
+
+Running Code/Instructions
+Clone and gradle sync should be the only requirements for running the app on the simulator. The only libraries used are imported through the gradle files.
+
