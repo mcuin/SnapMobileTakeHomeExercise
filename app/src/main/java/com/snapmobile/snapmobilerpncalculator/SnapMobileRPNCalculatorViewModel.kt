@@ -3,6 +3,7 @@ package com.snapmobile.snapmobilerpncalculator
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import java.text.DecimalFormat
 import java.util.Stack
 import javax.inject.Inject
@@ -13,15 +14,16 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
     val operatorsList = listOf("+", "-", "*", "/")
     val historicalEntry = mutableStateOf("")
     val currentEntry = mutableStateOf("")
-    var showDecimal = false
+    private var showDecimal = false
+    private val _evaluateError = MutableSharedFlow<EvaluateErrors?>()
+    val evaluateError = _evaluateError
 
     fun updateCurrentEntry(newCharacter: String) {
         currentEntry.value += newCharacter
     }
 
-    fun updateHistoricalEntry() {
+    suspend fun updateHistoricalEntry() {
         evaluate(historicalEntry.value, currentEntry.value)
-        currentEntry.value = ""
     }
 
     fun clearCurrentEntry() {
@@ -38,8 +40,12 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
         currentEntry.value = currentEntry.value.dropLast(1)
     }
 
-    private fun evaluate(previousHistoricalEntry: String, currentEntry: String) {
-        val trimmedCurrentEntry = previousHistoricalEntry + currentEntry.trimEnd().replace("\\s+".toRegex(), " ")
+    suspend fun clearEvaluateError() {
+        _evaluateError.emit(null)
+    }
+
+    private suspend fun evaluate(previousHistoricalEntry: String, newCurrentEntry: String) {
+        val trimmedCurrentEntry = previousHistoricalEntry + newCurrentEntry.trimEnd().replace("\\s+".toRegex(), " ")
         val enteredCharacters = trimmedCurrentEntry.split(" ")
         val numbersStack = Stack<Double>()
 
@@ -62,6 +68,10 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
                 }
                 "/" -> {
                     val secondNumber = numbersStack.pop()
+                    if (secondNumber == 0.0) {
+                        _evaluateError.emit(EvaluateErrors.DivideByZeroError)
+                        return
+                    }
                     val firstNumber = numbersStack.pop()
                     if (!showDecimal) {
                         showDecimal = firstNumber % secondNumber != 0.0
@@ -86,5 +96,10 @@ class SnapMobileRPNCalculatorViewModel @Inject constructor(): ViewModel() {
             stackString += decimalFormat.format(number) + " "
         }
         historicalEntry.value = stackString
+        currentEntry.value = ""
     }
+}
+
+sealed class EvaluateErrors {
+    data object DivideByZeroError: EvaluateErrors()
 }

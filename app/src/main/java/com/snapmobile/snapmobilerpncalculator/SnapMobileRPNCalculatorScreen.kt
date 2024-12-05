@@ -19,24 +19,46 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel = hiltViewModel()) {
 
-    Scaffold { scaffoldPadding ->
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    Scaffold(modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) }) { scaffoldPadding ->
+
+        val context = LocalContext.current
+        val evaluateError = snapMobileRPNCalculatorViewModel.evaluateError.collectAsStateWithLifecycle(null)
         val numbersList = listOf(7, 8, 9, 4, 5, 6, 1, 2, 3, 0)
+
+        LaunchedEffect(evaluateError.value) {
+            if (evaluateError.value != null) {
+                if (evaluateError.value == EvaluateErrors.DivideByZeroError) {
+                    snackbarHostState.showSnackbar(context.getString(R.string.divide_by_zero_error))
+                    snapMobileRPNCalculatorViewModel.clearEvaluateError()
+                }
+            }
+        }
 
         Column(modifier = modifier.fillMaxSize().padding(scaffoldPadding)) {
             UserHistoryText(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
@@ -55,7 +77,7 @@ fun SnapMobileRPNCalculatorScreen(modifier: Modifier, snapMobileRPNCalculatorVie
                 Column(modifier = modifier) {
                     BackspaceButton(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
                     SpaceButton(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
-                    EnterButton(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel)
+                    EnterButton(modifier = modifier, snapMobileRPNCalculatorViewModel = snapMobileRPNCalculatorViewModel, scope = coroutineScope)
                 }
             }
         }
@@ -118,9 +140,11 @@ fun OperationButton(modifier: Modifier, operator: String, snapMobileRPNCalculato
 }
 
 @Composable
-fun EnterButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel) {
+fun EnterButton(modifier: Modifier, snapMobileRPNCalculatorViewModel: SnapMobileRPNCalculatorViewModel, scope: CoroutineScope) {
     OutlinedButton(modifier = modifier.padding(8.dp), onClick = {
-        snapMobileRPNCalculatorViewModel.updateHistoricalEntry()
+        scope.launch {
+            snapMobileRPNCalculatorViewModel.updateHistoricalEntry()
+        }
     }, shape = CircleShape) {
         Icon(painter = painterResource(R.drawable.ic_enter), contentDescription = null)
     }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SnapMobileRPNCalculator</string>
+    <string name="divide_by_zero_error">Attempting to divide by zero. Please try a different notation.</string>
 </resources>
